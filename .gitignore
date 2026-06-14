@@ -1,0 +1,19 @@
+# Project documentation files
+AGENT.md
+HISTORY.md
+plan.md
+
+# Build files
+build/
+sdkconfig
+sdkconfig.old
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
