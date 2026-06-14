@@ -11,7 +11,7 @@
   - Se configuró la identidad de Git.
 
 ### 10:05 - Documentación Inicial
-- **Commit:** `pending`
+- **Commit:** `87c8820`
 - **Descripción:** Se creó el archivo README.md con la documentación inicial del proyecto.
 - **Detalles:**
   - Se describió el propósito del proyecto.
@@ -20,13 +20,22 @@
   - Se agregaron instrucciones de instalación y uso.
 
 ### 10:10 - Licencia
-- **Commit:** `pending`
+- **Commit:** `87c8820`
 - **Descripción:** Se agregó el archivo LICENSE con la licencia MIT.
 - **Detalles:**
   - Se estableció la licencia MIT para el proyecto.
 
 ### 10:15 - Historial de Desarrollo
-- **Commit:** `pending`
+- **Commit:** `87c8820`
 - **Descripción:** Se creó el archivo HISTORY.md para registrar el progreso del desarrollo.
 - **Detalles:**
   - Se registraron las acciones iniciales del proyecto.
+
+### 10:30 - Desarrollo del Componente argos_core
+- **Commit:** `a78c3cf`
+- **Descripción:** Se desarrolló el componente argos_core con estructuras y funciones básicas.
+- **Detalles:**
+  - Se creó la estructura de directorios para el componente.
+  - Se definieron tipos de datos y estructuras para medición y configuración.
+  - Se implementaron funciones para inicialización, creación de colas y mutex.
+  - Se integró el componente a la rama principal.
