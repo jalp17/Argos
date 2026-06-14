@@ -48,3 +48,16 @@
   - Se definieron 10 fases de desarrollo con tareas específicas.
   - Se marcaron 3 fases como completadas.
   - Se establecieron tareas pendientes y rumbo del proyecto.
+
+### 11:00 - Desarrollo del Componente argos_hal (Hardware Abstraction Layer)
+- **Commit:** `3ba5ea3`
+- **Descripción:** Se desarrolló el componente argos_hal con ADC, DAC, PWM y diagnósticos.
+- **Detalles:**
+  - Se creó hw_config.h con configuración centralizada de hardware (pines, frecuencias, resoluciones).
+  - Se implementó ADC con calibración multiescala (esp_adc_cal) para 4 canales.
+  - Se implementó DAC de 8-bit para 2 canales con escritura por voltaje (mV).
+  - Se implementó PWM (LEDC) de 13-bit para 4 canales a 10 kHz.
+  - Se añadieron métodos de depuración: self-test, print_diagnostics, verbose logging.
+  - Se crearon tests unitarios en test/test_hal.c para ADC, DAC, PWM y diagnósticos.
+  - Se integró main.c de prueba con monitoreo continuo.
+  - Se fusionó a rama principal tras verificación.

@@ -2,6 +2,8 @@
 
 **Argos** es un framework de instrumentación modular basado en ESP-IDF para el ESP32. El objetivo es el desarrollo de un código base modular, escalable y reutilizable para el microcontrolador ESP32. Este proyecto sirve como infraestructura para diversas prácticas de laboratorio de física, incluyendo instrumentación, medición, calibración y sistemas de lazo cerrado.
 
+**Repositorio:** `git@github.com:jalp17/Argos.git`
+
 ## Características principales
 
 - **Conectividad:** SoftAP con SSID y contraseña configurables.
