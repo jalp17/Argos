@@ -130,7 +130,7 @@ canvas{width:100%!important;height:100%!important}
 <div class="toast" id="toast"></div>
 <script>
 var ws=null,chart=null,chartData=[],maxPoints=50,measurementCount=0,startTime=Date.now();
-function conectarWS(){var p=window.location.protocol==='https:'?'wss:':'ws:';var u=p+'//'+window.location.hostname+':81/ws';ws=new WebSocket(u);
+function conectarWS(){var p=window.location.protocol==='https:'?'wss:':'ws:';var u=p+'//'+window.location.host+'/ws';ws=new WebSocket(u);
 ws.onopen=function(){document.getElementById('status').textContent='Conectado';document.getElementById('status').className='status status-online';mostrarToast('Conectado al dispositivo Argos','exito')};
 ws.onclose=function(){document.getElementById('status').textContent='Desconectado';document.getElementById('status').className='status status-offline';setTimeout(conectarWS,2000)};
 ws.onmessage=function(e){procesarMensaje(JSON.parse(e.data))};}

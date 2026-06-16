@@ -46,7 +46,7 @@ TEST_CASE("Router: pausa y reanudación", "[argos_router][control]") {
 }
 
 TEST_CASE("Router: enrutamiento de medición", "[argos_router][route]") {
-    argos_measurement_t medicion = {1000, 0, 1.65f};
+    argos_measurement_t medicion = {1000, 1.65f, 0};
     int entregados = argos_router_route_measurement(&medicion);
     TEST_ASSERT_TRUE(entregados >= 0);
     RTR_LOG("Route test OK: %d destinos", entregados);
@@ -78,7 +78,7 @@ TEST_CASE("Router: generación CSV", "[argos_router][csv]") {
     TEST_ASSERT_TRUE(n > 0);
     RTR_LOG("CSV header: %s", header);
 
-    argos_measurement_t m = {12345, 2, 1.5f};
+    argos_measurement_t m = {12345, 1.5f, 2};
     char linea[256];
     n = exp_config_measurement_to_csv(cfg, &m, linea, sizeof(linea));
     TEST_ASSERT_TRUE(n > 0);

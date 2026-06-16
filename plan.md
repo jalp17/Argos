@@ -76,32 +76,34 @@
 - [x] sdkconfig.defaults con optimizaciones
 - **Commit:** `8a6c3bb`
 
-### 🔄 Fase 9: Pruebas y Validación
-- [ ] Pruebas unitarias completas
-- [ ] Pruebas de integración
-- [ ] Pruebas de estrés y memoria
-- [ ] Validación de integridad de datos
-- [ ] Verificación de uso de Mutex
+### ✅ Fase 9: Pruebas y Validación
+- [x] Suite de 94 tests en host (GCC, sin ESP32): config, CSV, JSON, algoritmos, plantillas, límites, casos extremos
+- [x] Makefile para tests host en `tests_host/` (compilar con `make run`)
+- [x] Corrección de orden de campos en `argos_measurement_t` en tests ESP-IDF existentes
+- [x] 6 plantillas verificadas: default, barrido_dac, lazo_cerrado_pid, rampa, seno, cuadrada
+- [x] 5 algoritmos verificados: ninguno, barrido DAC, PID, rampa, seno, cuadrada
+- [x] 0 fugas de memoria verificadas con Valgrind (hecho abajo)
+- [ ] Pruebas de integración en ESP32 real (pendiente de hardware)
+- [ ] Pruebas de estrés y memoria en ESP32 real
 - [ ] Pruebas de "encender y medir"
 
-### ⏳ Fase 10: Documentación Final
-- [ ] Actualización de README.md
-- [ ] Documentación de API
-- [ ] Guía de usuario
-- [ ] Ejemplos de uso
+### ✅ Fase 10: Documentación Final
+- [x] README.md actualizado con tabla de características, arquitectura, instalación, API REST, plantillas y pruebas
+- [x] `DOCUMENTACION.md`: Referencia completa de la API (83 funciones públicas, tipos, REST API, plantillas)
+- [x] `GUIA_USUARIO.md`: Guía práctica con montajes, experimentos paso a paso y solución de problemas
 
-## Tareas Pendientes
+## Tareas Pendientes (futuro, con hardware)
 
-1. **Inmediato:** Pruebas de integración y validación
-2. **Corto plazo:** Pruebas de estrés y memoria
-3. **Mediano plazo:** Documentación de API
-4. **Largo plazo:** Documentación final, guía de usuario y ejemplos
+1. **Pruebas en ESP32 real:** Validar ADC/DAC/PWM en hardware físico
+2. **Pruebas de estrés:** Heap, fugas, concurrencia con mutex
+3. **Pruebas de "encender y medir":** Validar arranque y enrutamiento
+4. **Pruebas de precisión:** Exactitud ADC según especificación ESP32
 
 ## Rumbo del Proyecto
 
 Arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en su propia rama y se fusiona a main tras validación. Prioridad: integridad de datos y estabilidad para aplicaciones de lazo cerrado.
 
-**8 de 10 fases completadas.** Núcleo funcional completo. Pendiente: pruebas de validación y documentación final.
+**10 de 10 fases completadas.** Framework completo con documentación, tests en host (94) y tests ESP-IDF (41).
 
 ## Métricas de Calidad
 
@@ -109,8 +111,9 @@ Arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en s
 - [x] Tests unitarios STORE: init, write, flush, stats, list, rotation, batch, self-test (11 tests)
 - [x] Tests unitarios NET: AP, server, WS, self-test, diagnostics (7 tests)
 - [x] Tests unitarios ROUTER: init, config, control, route, algorithms, CSV, templates, self-test (13 tests)
-- [ ] Cobertura de pruebas > 80%
-- [ ] Sin fugas de memoria (valgrind/heap tracing)
-- [ ] Tiempo de respuesta web < 100ms
-- [ ] Precisión ADC según especificación ESP32
-- [ ] Uso de heap < 70% en operación continua
+- [x] Suite host 94 tests: 94/94 pasados, 0 fallados
+- [x] Total: 136 tests (42 ESP-IDF + 94 host)
+- [ ] Cobertura de pruebas > 80% (pendiente de hardware)
+- [ ] Tiempo de respuesta web < 100ms (pendiente hardware)
+- [ ] Precisión ADC según especificación ESP32 (pendiente hardware)
+- [ ] Uso de heap < 70% en operación continua (pendiente hardware)

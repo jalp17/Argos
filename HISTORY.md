@@ -123,6 +123,20 @@
   - Se agregó reset periódico del TWDT en el bucle principal.
   - Se implementó apagado ordenado con desinicialización secuencial de componentes.
   - Se creó sdkconfig.defaults con configuración optimizada para watchdogs, WiFi, HTTP, FreeRTOS y LittleFS.
-  - Se creó build.sh para automatizar la compilación del proyecto.
-  - Se actualizó main/CMakeLists.txt con dependencias de esp_timer y heap.
-  - Se fusionó a rama principal tras verificación.
+   - Se creó build.sh para automatizar la compilación del proyecto.
+   - Se actualizó main/CMakeLists.txt con dependencias de esp_timer y heap.
+   - Se fusionó a rama principal tras verificación.
+
+### 14:00 - Fase 9: Pruebas sin Hardware (Host Tests)
+- **Descripción:** Se creó suite de 94 tests para compilar con GCC puro sin ESP32.
+- **Detalles:**
+  - `tests_host/test_completo.c`: 94 tests de configuración, CSV, JSON, 6 plantillas, 5 algoritmos, límites y robustez.
+  - `tests_host/Makefile`: compilar con `make`, ejecutar con `make run`. Resultado: 94/94 OK.
+  - Se corrigió orden de campos `{timestamp, value, channel}` en `test/test_router.c`.
+
+### 14:30 - Fase 10: Documentación Final
+- **Descripción:** Actualización de README.md, plan.md e HISTORY.md con estado completo.
+- **Detalles:**
+  - README.md: secciones de Red, Watchdogs, Rotación, Algoritmos, Referencia de API, Guía de laboratorio.
+  - plan.md: actualizado con Fase 9 y 10, métricas finales (136 tests, 10/10 fases).
+  - Se unificó toda la documentación en README.md eliminando archivos temporales de contexto.
