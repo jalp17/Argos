@@ -31,18 +31,21 @@
 - [x] Métodos de depuración: self-test, diagnostics, verbose logging
 - **Commit:** `3ba5ea3`
 
-### ⏳ Fase 5: Desarrollo del Componente argos_store (Almacenamiento)
-- [ ] Estructura de directorios para argos_store
-- [ ] Inicialización de LittleFS
-- [ ] Implementación de buffer circular
-- [ ] Implementación de log rotation
-- [ ] Gestión de memoria crítica (80-90% threshold)
-- [ ] Pruebas de integridad de datos
+### ✅ Fase 5: Desarrollo del Componente argos_store (Almacenamiento)
+- [x] Estructura de directorios para argos_store
+- [x] Inicialización de LittleFS con montaje automático
+- [x] Implementación de buffer circular (64 KB RAM + mutex)
+- [x] Implementación de log rotation (85% warning, 95% critical)
+- [x] Gestión de memoria crítica con estado read-only
+- [x] Tarea de flush periódico a flash (1s)
+- [x] Exportación de archivos CSV con cabecera estándar
+- [x] Tests unitarios (11 tests): init, write, flush, stats, list, rotation, batch, diagnostics, self-test
+- **Commit:** `83a350e`
 
-### ⏳ Fase 6: Desarrollo del Componente argos_net (Conectividad y Servidor Web)
+### 🔄 Fase 6: Desarrollo del Componente argos_net (Conectividad y Servidor Web)
 - [ ] Estructura de directorios para argos_net
 - [ ] Configuración de SoftAP con IP estática
-- [ ] Servidor web embebido
+- [ ] Servidor web embebido (HTTP server)
 - [ ] Interfaz web (HTML/CSS/JS minificados)
 - [ ] WebSockets para datos en tiempo real
 - [ ] REST API para descarga de datos (CSV/JSON)
@@ -56,8 +59,8 @@
 - [ ] Pruebas de concurrencia
 
 ### ⏳ Fase 8: Integración y Main
-- [ ] Implementación de main.c (orquestador)
-- [ ] Inicialización de todos los componentes
+- [x] Integración de HAL + Store en main.c (orquestador)
+- [ ] Inicialización de todos los componentes (argos_net + argos_router)
 - [ ] Configuración de Watchdogs
 - [ ] Pruebas de integración completa
 - [ ] Optimización de memoria
@@ -78,10 +81,10 @@
 
 ## Tareas Pendientes
 
-1. **Inmediato:** Desarrollo de argos_store (LittleFS + log rotation + buffer circular)
-2. **Corto plazo:** argos_net (SoftAP + WebServer + WebSockets + REST API)
-3. **Mediano plazo:** argos_router (FreeRTOS queues multicanal)
-4. **Largo plazo:** Integración completa + Pruebas + Documentación final
+1. **Inmediato:** Desarrollo de argos_net (SoftAP + WebServer + WebSockets + REST API)
+2. **Corto plazo:** argos_router (FreeRTOS queues multicanal)
+3. **Mediano plazo:** Integración completa + Pruebas + Optimización
+4. **Largo plazo:** Documentación final + Ejemplos de uso
 
 ## Rumbo del Proyecto
 
@@ -90,6 +93,7 @@ El proyecto sigue una arquitectura modular por componentes ESP-IDF. Cada compone
 ## Métricas de Calidad
 
 - [x] Tests unitarios HAL: ADC, DAC, PWM, Diagnostics (10 tests)
+- [x] Tests unitarios STORE: init, write, flush, stats, list, rotation, batch, self-test (11 tests)
 - [ ] Cobertura de pruebas > 80%
 - [ ] Sin fugas de memoria (valgrind/heap tracing)
 - [ ] Tiempo de respuesta web < 100ms
