@@ -61,3 +61,19 @@
   - Se crearon tests unitarios en test/test_hal.c para ADC, DAC, PWM y diagnósticos.
   - Se integró main.c de prueba con monitoreo continuo.
   - Se fusionó a rama principal tras verificación.
+
+### 11:30 - Desarrollo del Componente argos_store (Almacenamiento)
+- **Commit:** `83a350e`
+- **Descripción:** Se desarrolló el componente argos_store con LittleFS, buffer circular y log rotation.
+- **Detalles:**
+  - Se implementó buffer circular en RAM de 64 KB con mutex para escritura segura.
+  - Se implementó LittleFS como sistema de archivos con montaje automático.
+  - Se implementó tarea de flush periódico (1s) a flash.
+  - Se implementó log rotation automática al 85% de uso de partición.
+  - Se implementó estado crítico (95%) que detiene escrituras para evitar corrupción.
+  - Se implementó exportación de archivos CSV con cabecera estándar.
+  - Se implementaron callbacks para eventos de almacenamiento.
+  - Se implementaron métodos de depuración: self-test, diagnostics, format.
+  - Se crearon tests unitarios (11 tests) en test/test_store.c.
+  - Se integró con main.c para logging continuo de mediciones ADC.
+  - Se fusionó a rama principal tras verificación.
