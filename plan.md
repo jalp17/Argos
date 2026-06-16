@@ -52,16 +52,24 @@
 - [x] Tests unitarios (7 tests): AP, server, WS, self-test, diagnostics
 - **Commit:** `80c5a80`
 
-### ⏳ Fase 7: Desarrollo del Componente argos_router (Enrutamiento de Datos)
-- [ ] Estructura de directorios para argos_router
-- [ ] Colas FreeRTOS para ruteo entre componentes
-- [ ] Logging multicanal (Serial, Almacenamiento, Web)
-- [ ] Sincronización con mutex
-- [ ] Pruebas de concurrencia
+### ✅ Fase 7: Desarrollo del Componente argos_router (Enrutamiento y Control de Experimentos)
+- [x] Estructura de directorios para argos_router
+- [x] Sistema de configuración de experimentos (pines, sensibilidad, intervalo, columnas)
+- [x] 6 plantillas predefinidas: default, barrido_dac, lazo_cerrado_pid, rampa, seno, cuadrada
+- [x] Guardado/carga de plantillas en LittleFS (JSON)
+- [x] 5 algoritmos de práctica: ninguno, barrido DAC, PID, rampa, senoidal, cuadrada
+- [x] Colas FreeRTOS para ruteo de datos entre componentes
+- [x] Enrutamiento multicanal (Serial + Store + WebSocket)
+- [x] Tarea de adquisición con control inicio/parada/pausa
+- [x] Generación de CSV configurable según orden de columnas
+- [x] Logging multicanal con formato personalizable
+- [x] Tests unitarios (13 tests): init, config, control, route, algorithms, CSV, templates, stats, self-test
+- **Commit:** `c464870`
 
-### ⏳ Fase 8: Integración y Main
-- [x] Integración de HAL + Store en main.c (orquestador)
-- [ ] Inicialización de todos los componentes (argos_net + argos_router)
+### 🔄 Fase 8: Integración y Main
+- [x] Integración de todos los componentes en main.c como orquestador
+- [x] Inicialización secuencial: Core → HAL → Store → Net → Router
+- [x] Arranque automático de experimento al iniciar
 - [ ] Configuración de Watchdogs
 - [ ] Pruebas de integración completa
 - [ ] Optimización de memoria
@@ -80,22 +88,41 @@
 - [ ] Guía de usuario
 - [ ] Ejemplos de uso
 
+### ⏳ Fase 9: Pruebas y Validación
+- [ ] Pruebas unitarias completas
+- [ ] Pruebas de integración
+- [ ] Pruebas de estrés y memoria
+- [ ] Validación de integridad de datos
+- [ ] Verificación de uso de Mutex
+- [ ] Pruebas de "encender y medir"
+
+### ⏳ Fase 10: Documentación Final
+- [ ] Actualización de README.md
+- [ ] Documentación de API
+- [ ] Guía de usuario
+- [ ] Ejemplos de uso
+
 ## Tareas Pendientes
 
-1. **Inmediato:** Desarrollo de argos_router (FreeRTOS queues multicanal para logging serial + store + WS)
-2. **Corto plazo:** Integración completa de todos los componentes
-3. **Mediano plazo:** Pruebas de estrés, memoria y optimización
-4. **Largo plazo:** Documentación final + Ejemplos de uso
+1. **Inmediato:** Configuración de Watchdogs y pruebas de integración
+2. **Corto plazo:** Pruebas de estrés, memoria y validación de integridad
+3. **Mediano plazo:** Optimización de memoria y documentación de API
+4. **Largo plazo:** Documentación final, guía de usuario y ejemplos de uso
 
 ## Rumbo del Proyecto
 
 El proyecto sigue una arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en su propia rama y se fusiona a main tras validación. La prioridad es la integridad de datos y estabilidad del sistema para aplicaciones de lazo cerrado en laboratorios de física.
+
+Actualmente 7 de 10 fases completadas. El núcleo funcional está completo: HAL (ADC/DAC/PWM), almacenamiento (LittleFS + buffer circular + log rotation), red (SoftAP + WebServer + WebSockets + API REST) y enrutador (configuración de experimentos, plantillas, algoritmos, logging multicanal).
+
+Próximos pasos: Watchdogs, pruebas de validación y documentación final.
 
 ## Métricas de Calidad
 
 - [x] Tests unitarios HAL: ADC, DAC, PWM, Diagnostics (10 tests)
 - [x] Tests unitarios STORE: init, write, flush, stats, list, rotation, batch, self-test (11 tests)
 - [x] Tests unitarios NET: AP, server, WS, self-test, diagnostics (7 tests)
+- [x] Tests unitarios ROUTER: init, config, control, route, algorithms, CSV, templates, self-test (13 tests)
 - [ ] Cobertura de pruebas > 80%
 - [ ] Sin fugas de memoria (valgrind/heap tracing)
 - [ ] Tiempo de respuesta web < 100ms
