@@ -77,3 +77,20 @@
   - Se crearon tests unitarios (11 tests) en test/test_store.c.
   - Se integró con main.c para logging continuo de mediciones ADC.
   - Se fusionó a rama principal tras verificación.
+
+### 12:00 - Desarrollo del Componente argos_net (Conectividad y Servidor Web)
+- **Commit:** `80c5a80`
+- **Descripción:** Se desarrolló el componente argos_net con SoftAP, servidor web, WebSockets y API REST.
+- **Detalles:**
+  - Se implementó SoftAP con SSID "Argos-AP", contraseña "argos1234" e IP estática 192.168.4.1.
+  - Se implementó servidor web HTTP con página de control en español (HTML/CSS/JS).
+  - Se implementó WebSocket en /ws para transmisión de datos en tiempo real.
+  - Se implementó API REST: /api/estado, /api/archivos, /api/descargar.
+  - Se implementó panel de control con visualización de 4 canales ADC en tiempo real.
+  - Se implementó gráfico en tiempo real usando Chart.js.
+  - Se implementó control de DAC y PWM desde la interfaz web.
+  - Se implementó lista de archivos de registro con descarga directa.
+  - Se implementaron métodos de depuración: self-test, diagnostics.
+  - Se crearon tests unitarios (7 tests) en test/test_net.c.
+  - Se integró con main.c para envío de mediciones por WebSocket.
+  - Se fusionó a rama principal tras verificación.
