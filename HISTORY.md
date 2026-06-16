@@ -111,3 +111,18 @@
   - Se crearon tests unitarios (13 tests) en test/test_router.c.
   - Se integró con main.c como orquestador central del sistema.
   - Se fusionó a rama principal tras verificación.
+
+### 13:00 - Fase 8: Integración Completa y Configuración
+- **Commit:** `8a6c3bb`
+- **Descripción:** Integración completa de todos los componentes con watchdogs, optimización de memoria y script de compilación.
+- **Detalles:**
+  - Se implementó Task Watchdog Timer (TWDT) con timeout de 10 segundos y pánico en fallo.
+  - Se implementó Interrupt Watchdog Timer (IWDT) con timeout de 300ms.
+  - Se agregó monitoreo de memoria heap con métricas de uso y alertas de memoria baja.
+  - Se implementó inicialización tolerante a fallos: cada componente puede fallar sin detener el sistema.
+  - Se agregó reset periódico del TWDT en el bucle principal.
+  - Se implementó apagado ordenado con desinicialización secuencial de componentes.
+  - Se creó sdkconfig.defaults con configuración optimizada para watchdogs, WiFi, HTTP, FreeRTOS y LittleFS.
+  - Se creó build.sh para automatizar la compilación del proyecto.
+  - Se actualizó main/CMakeLists.txt con dependencias de esp_timer y heap.
+  - Se fusionó a rama principal tras verificación.
