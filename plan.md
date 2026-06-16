@@ -42,14 +42,15 @@
 - [x] Tests unitarios (11 tests): init, write, flush, stats, list, rotation, batch, diagnostics, self-test
 - **Commit:** `83a350e`
 
-### 🔄 Fase 6: Desarrollo del Componente argos_net (Conectividad y Servidor Web)
-- [ ] Estructura de directorios para argos_net
-- [ ] Configuración de SoftAP con IP estática
-- [ ] Servidor web embebido (HTTP server)
-- [ ] Interfaz web (HTML/CSS/JS minificados)
-- [ ] WebSockets para datos en tiempo real
-- [ ] REST API para descarga de datos (CSV/JSON)
-- [ ] Pruebas de conectividad
+### ✅ Fase 6: Desarrollo del Componente argos_net (Conectividad y Servidor Web)
+- [x] Estructura de directorios para argos_net
+- [x] Configuración de SoftAP con IP estática (192.168.4.1)
+- [x] Servidor web embebido (HTTP server en puerto 80)
+- [x] Interfaz web en español (HTML/CSS/JS con Chart.js)
+- [x] WebSockets para datos en tiempo real (/ws)
+- [x] REST API para descarga de datos (CSV) y estado del sistema
+- [x] Tests unitarios (7 tests): AP, server, WS, self-test, diagnostics
+- **Commit:** `80c5a80`
 
 ### ⏳ Fase 7: Desarrollo del Componente argos_router (Enrutamiento de Datos)
 - [ ] Estructura de directorios para argos_router
@@ -81,9 +82,9 @@
 
 ## Tareas Pendientes
 
-1. **Inmediato:** Desarrollo de argos_net (SoftAP + WebServer + WebSockets + REST API)
-2. **Corto plazo:** argos_router (FreeRTOS queues multicanal)
-3. **Mediano plazo:** Integración completa + Pruebas + Optimización
+1. **Inmediato:** Desarrollo de argos_router (FreeRTOS queues multicanal para logging serial + store + WS)
+2. **Corto plazo:** Integración completa de todos los componentes
+3. **Mediano plazo:** Pruebas de estrés, memoria y optimización
 4. **Largo plazo:** Documentación final + Ejemplos de uso
 
 ## Rumbo del Proyecto
@@ -94,6 +95,7 @@ El proyecto sigue una arquitectura modular por componentes ESP-IDF. Cada compone
 
 - [x] Tests unitarios HAL: ADC, DAC, PWM, Diagnostics (10 tests)
 - [x] Tests unitarios STORE: init, write, flush, stats, list, rotation, batch, self-test (11 tests)
+- [x] Tests unitarios NET: AP, server, WS, self-test, diagnostics (7 tests)
 - [ ] Cobertura de pruebas > 80%
 - [ ] Sin fugas de memoria (valgrind/heap tracing)
 - [ ] Tiempo de respuesta web < 100ms
