@@ -53,7 +53,6 @@
 - **Commit:** `80c5a80`
 
 ### ✅ Fase 7: Desarrollo del Componente argos_router (Enrutamiento y Control de Experimentos)
-- [x] Estructura de directorios para argos_router
 - [x] Sistema de configuración de experimentos (pines, sensibilidad, intervalo, columnas)
 - [x] 6 plantillas predefinidas: default, barrido_dac, lazo_cerrado_pid, rampa, seno, cuadrada
 - [x] Guardado/carga de plantillas en LittleFS (JSON)
@@ -62,33 +61,22 @@
 - [x] Enrutamiento multicanal (Serial + Store + WebSocket)
 - [x] Tarea de adquisición con control inicio/parada/pausa
 - [x] Generación de CSV configurable según orden de columnas
-- [x] Logging multicanal con formato personalizable
-- [x] Tests unitarios (13 tests): init, config, control, route, algorithms, CSV, templates, stats, self-test
+- [x] Tests unitarios (13 tests)
 - **Commit:** `c464870`
 
-### 🔄 Fase 8: Integración y Main
+### ✅ Fase 8: Integración Completa
 - [x] Integración de todos los componentes en main.c como orquestador
-- [x] Inicialización secuencial: Core → HAL → Store → Net → Router
-- [x] Arranque automático de experimento al iniciar
-- [ ] Configuración de Watchdogs
-- [ ] Pruebas de integración completa
-- [ ] Optimización de memoria
+- [x] Inicialización tolerante a fallos por componente
+- [x] TWDT configurado (10s timeout, pánico en fallo)
+- [x] IWDT configurado (300ms timeout)
+- [x] Monitoreo de memoria heap con alertas
+- [x] Arranque automático de experimento
+- [x] Apagado ordenado con desinicialización secuencial
+- [x] Script de compilación (build.sh)
+- [x] sdkconfig.defaults con optimizaciones
+- **Commit:** `8a6c3bb`
 
-### ⏳ Fase 9: Pruebas y Validación
-- [ ] Pruebas unitarias completas
-- [ ] Pruebas de integración
-- [ ] Pruebas de estrés y memoria
-- [ ] Validación de integridad de datos
-- [ ] Verificación de uso de Mutex
-- [ ] Pruebas de "encender y medir"
-
-### ⏳ Fase 10: Documentación Final
-- [ ] Actualización de README.md
-- [ ] Documentación de API
-- [ ] Guía de usuario
-- [ ] Ejemplos de uso
-
-### ⏳ Fase 9: Pruebas y Validación
+### 🔄 Fase 9: Pruebas y Validación
 - [ ] Pruebas unitarias completas
 - [ ] Pruebas de integración
 - [ ] Pruebas de estrés y memoria
@@ -104,18 +92,16 @@
 
 ## Tareas Pendientes
 
-1. **Inmediato:** Configuración de Watchdogs y pruebas de integración
-2. **Corto plazo:** Pruebas de estrés, memoria y validación de integridad
-3. **Mediano plazo:** Optimización de memoria y documentación de API
-4. **Largo plazo:** Documentación final, guía de usuario y ejemplos de uso
+1. **Inmediato:** Pruebas de integración y validación
+2. **Corto plazo:** Pruebas de estrés y memoria
+3. **Mediano plazo:** Documentación de API
+4. **Largo plazo:** Documentación final, guía de usuario y ejemplos
 
 ## Rumbo del Proyecto
 
-El proyecto sigue una arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en su propia rama y se fusiona a main tras validación. La prioridad es la integridad de datos y estabilidad del sistema para aplicaciones de lazo cerrado en laboratorios de física.
+Arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en su propia rama y se fusiona a main tras validación. Prioridad: integridad de datos y estabilidad para aplicaciones de lazo cerrado.
 
-Actualmente 7 de 10 fases completadas. El núcleo funcional está completo: HAL (ADC/DAC/PWM), almacenamiento (LittleFS + buffer circular + log rotation), red (SoftAP + WebServer + WebSockets + API REST) y enrutador (configuración de experimentos, plantillas, algoritmos, logging multicanal).
-
-Próximos pasos: Watchdogs, pruebas de validación y documentación final.
+**8 de 10 fases completadas.** Núcleo funcional completo. Pendiente: pruebas de validación y documentación final.
 
 ## Métricas de Calidad
 
