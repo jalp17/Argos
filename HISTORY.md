@@ -94,3 +94,20 @@
   - Se crearon tests unitarios (7 tests) en test/test_net.c.
   - Se integró con main.c para envío de mediciones por WebSocket.
   - Se fusionó a rama principal tras verificación.
+
+### 12:30 - Desarrollo del Componente argos_router (Enrutamiento y Control de Experimentos)
+- **Commit:** `c464870`
+- **Descripción:** Se desarrolló el componente argos_router con configuración de experimentos, plantillas, algoritmos y enrutamiento multicanal.
+- **Detalles:**
+  - Se implementó `experiment_config.h` con configuración completa de experimentos: pines ADC/DAC/PWM, sensibilidad, intervalo de muestreo, número de muestras, modo de disparo, orden de columnas CSV.
+  - Se implementaron 6 plantillas predefinidas: default, barrido_dac, lazo_cerrado_pid, rampa, seno, cuadrada.
+  - Se implementó sistema de guardado/carga de plantillas en LittleFS (JSON).
+  - Se implementaron 5 algoritmos de práctica: ninguno (captura directa), barrido DAC, PID, rampa, senoidal, cuadrada.
+  - Se implementó enrutamiento multicanal de mediciones a tres destinos simultáneos: Serial, Store y WebSocket.
+  - Se implementó tarea de adquisición con control de inicio/parada/pausa.
+  - Se implementó generación de CSV configurable según orden de columnas.
+  - Se implementó logging multicanal con formato personalizable.
+  - Se implementaron métodos de depuración: self-test, diagnostics, stats.
+  - Se crearon tests unitarios (13 tests) en test/test_router.c.
+  - Se integró con main.c como orquestador central del sistema.
+  - Se fusionó a rama principal tras verificación.
