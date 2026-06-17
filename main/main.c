@@ -73,7 +73,7 @@ static void finalizar_ordenadamente(void) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "Iniciando Argos - Framework de Instrumentación v2.1");
-    ESP_LOGI(TAG, "ESP-IDF v5.3, FreeRTOS, LittleFS, WebSocket");
+    ESP_LOGI(TAG, "ESP-IDF v5.3, FreeRTOS, SPIFFS, WebSocket");
 
     inicializar_watchdogs();
     imprimir_metricas_memoria();
@@ -109,7 +109,7 @@ void app_main(void) {
         store_ok = true;
         ESP_LOGI(TAG, "Almacenamiento listo");
     } else {
-        ESP_LOGE(TAG, "Error en almacenamiento: %s, continuando sin LittleFS", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "Error en almacenamiento: %s, continuando sin SPIFFS", esp_err_to_name(ret));
     }
 
     /* FASE 3: Inicializar red */

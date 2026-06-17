@@ -24,8 +24,7 @@ extern "C" {
 #define ARGOS_NET_AP_NETMASK       "255.255.255.0"
 
 /* ==================== CONFIGURACIÓN SERVIDOR ==================== */
-#define ARGOS_NET_HTTP_PORT        80
-#define ARGOS_NET_WS_PORT          81
+#define ARGOS_NET_HTTP_PORT        80    /* WS servido en el mismo puerto vía /ws */
 #define ARGOS_NET_HTTP_STACK_SIZE  4096
 #define ARGOS_NET_WS_STACK_SIZE    4096
 

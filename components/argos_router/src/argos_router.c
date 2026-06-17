@@ -1,13 +1,12 @@
 #include "argos_router.h"
-#include "argos_store.h"
+#include "argos_core.h"
 #include "argos_net.h"
 #include "experiment_config.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "freertos/semphr.h"
-#include <string.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
@@ -35,7 +34,7 @@ static SemaphoreHandle_t s_state_mutex = NULL;
 
 static uint32_t s_total_mediciones = 0;
 static uint32_t s_errores = 0;
-static uint32_t s_tiempo_inicio = 0;
+static int64_t s_tiempo_inicio = 0;
 static float s_algo_acumulador = 0.0f;
 static uint32_t s_algo_paso = 0;
 static bool s_algo_terminado = false;
@@ -371,7 +370,7 @@ esp_err_t exp_config_list_templates(char templates[][EXP_CONFIG_TEMPLATE_NAME_MA
         (*count)++;
     }
 
-    /* Plantillas guardadas en LittleFS */
+    /* Plantillas guardadas en SPIFFS */
     DIR *dir = opendir(RUTA_TEMPLATES);
     if (dir != NULL) {
         struct dirent *entry;
@@ -1005,7 +1004,7 @@ void argos_router_acquisition_task(void *arg) {
 
             /* Verificar límite de tiempo */
             if (s_config.duracion_segundos > 0) {
-                uint32_t ahora = esp_timer_get_time() / 1000000;
+                int64_t ahora = esp_timer_get_time() / 1000000;
                 if (ahora - s_tiempo_inicio >= s_config.duracion_segundos) {
                     RTR_LOG("Duración alcanzada: %lu s", s_config.duracion_segundos);
                     argos_router_stop_experiment();
@@ -1052,7 +1051,7 @@ esp_err_t argos_router_get_stats(argos_router_stats_t *stats) {
     stats->errores = s_errores;
 
     if (s_tiempo_inicio > 0) {
-        stats->tiempo_activo_seg = (esp_timer_get_time() / 1000000) - s_tiempo_inicio;
+        stats->tiempo_activo_seg = (uint32_t)((esp_timer_get_time() / 1000000) - s_tiempo_inicio);
     } else {
         stats->tiempo_activo_seg = 0;
     }

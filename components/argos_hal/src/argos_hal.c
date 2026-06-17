@@ -1,6 +1,7 @@
 #include "argos_hal.h"
 #include "hw_config.h"
 #include "esp_log.h"
+#include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 #include "freertos/FreeRTOS.h"
@@ -13,6 +14,7 @@ static adc_channel_t s_adc_channels[ARGOS_ADC_CHANNELS] = ARGOS_ADC_DEFAULT_CHAN
 static dac_channel_t s_dac_channels[ARGOS_DAC_CHANNELS] = ARGOS_DAC_DEFAULT_CHANNELS;
 static gpio_num_t s_pwm_gpios[ARGOS_PWM_CHANNELS] = ARGOS_PWM_DEFAULT_GPIOS;
 
+static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 static adc_cali_handle_t s_adc_chars[ARGOS_ADC_CHANNELS] = {NULL};
 static bool s_adc_initialized = false;
 static bool s_dac_initialized = false;
@@ -44,16 +46,24 @@ esp_err_t argos_hal_adc_init(const argos_config_t *config) {
 
     HAL_DEBUG_LOG("Initializing ADC...");
 
-    esp_err_t ret = adc1_config_width(ARGOS_ADC_WIDTH);
+    adc_oneshot_unit_init_cfg_t unit_cfg = {
+        .unit_id = ARGOS_ADC_UNIT,
+    };
+    esp_err_t ret = adc_oneshot_new_unit(&unit_cfg, &s_adc_handle);
     if (ret != ESP_OK) {
-        HAL_DEBUG_ERR("Failed to configure ADC width: %s", esp_err_to_name(ret));
+        HAL_DEBUG_ERR("Failed to create ADC unit: %s", esp_err_to_name(ret));
         return ret;
     }
 
+    adc_oneshot_chan_cfg_t chan_cfg = {
+        .atten = ARGOS_ADC_ATTEN,
+        .bitwidth = ARGOS_ADC_WIDTH,
+    };
+
     for (int i = 0; i < ARGOS_ADC_CHANNELS; i++) {
-        ret = adc1_config_channel_atten(s_adc_channels[i], ARGOS_ADC_ATTEN);
+        ret = adc_oneshot_config_channel(s_adc_handle, s_adc_channels[i], &chan_cfg);
         if (ret != ESP_OK) {
-            HAL_DEBUG_ERR("Failed to configure channel %d atten: %s", s_adc_channels[i], esp_err_to_name(ret));
+            HAL_DEBUG_ERR("Failed to configure channel %d: %s", s_adc_channels[i], esp_err_to_name(ret));
             return ret;
         }
 
@@ -87,7 +97,11 @@ esp_err_t argos_hal_adc_read_raw(adc_channel_t channel, int *raw_value) {
         return ESP_ERR_INVALID_ARG;
     }
 
-    *raw_value = adc1_get_raw(channel);
+    esp_err_t ret = adc_oneshot_read(s_adc_handle, channel, raw_value);
+    if (ret != ESP_OK) {
+        HAL_DEBUG_ERR("ADC read failed channel %d: %s", channel, esp_err_to_name(ret));
+        return ret;
+    }
     HAL_VERBOSE_LOG("ADC Channel %d raw: %d", channel, *raw_value);
     return ESP_OK;
 }
@@ -148,7 +162,11 @@ esp_err_t argos_hal_adc_set_atten(adc_channel_t channel, adc_atten_t atten) {
         return ESP_ERR_INVALID_STATE;
     }
 
-    esp_err_t ret = adc1_config_channel_atten(channel, atten);
+    adc_oneshot_chan_cfg_t chan_cfg = {
+        .atten = atten,
+        .bitwidth = ARGOS_ADC_WIDTH,
+    };
+    esp_err_t ret = adc_oneshot_config_channel(s_adc_handle, channel, &chan_cfg);
     if (ret == ESP_OK) {
         HAL_DEBUG_LOG("ADC Channel %d attenuation set to %d dB", channel, atten);
     }
