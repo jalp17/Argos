@@ -11,7 +11,7 @@ extern "C" {
 /**
  * @brief Componente de almacenamiento para Argos.
  * 
- * Proporciona LittleFS con buffer circular, log rotation y gestión de memoria crítica.
+ * Proporciona SPIFFS con buffer circular, log rotation y gestión de memoria crítica.
  * Soporta formatos CSV y JSON para exportación de datos.
  */
 

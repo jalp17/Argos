@@ -6,6 +6,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "esp_timer.h"
 #include "esp_http_server.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -86,9 +87,9 @@ static esp_err_t manejador_api_estado(httpd_req_t *req) {
     argos_store_get_stats(&stats);
 
     int n = snprintf(buffer, sizeof(buffer),
-        "{\"tipo\":\"estado\",\"ssid\":\"%s\",\"ip\":\"%s\",\"clientes\":%d,\"almacenamiento\":\"%d%% usado\",\"uptime\":\"%lus\"}",
+        "{\"tipo\":\"estado\",\"ssid\":\"%s\",\"ip\":\"%s\",\"clientes\":%d,\"almacenamiento\":\"%d%% usado\",\"uptime\":\"%llds\"}",
         s_ap_ssid, s_ap_ip, s_ws_client_count, stats.usage_percent,
-        (esp_timer_get_time() / 1000000));
+        (long long)(esp_timer_get_time() / 1000000));
 
     httpd_resp_set_type(req, "application/json");
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
@@ -328,8 +329,8 @@ esp_err_t argos_net_server_init(void) {
     config.stack_size = ARGOS_NET_HTTP_STACK_SIZE;
     config.max_uri_handlers = 12;
     config.lru_purge_enable = true;
-    config.close_func = manejador_ws_close;
-    config.open_func = manejador_ws_open;
+    config.close_fn = manejador_ws_close;
+    config.open_fn = manejador_ws_open;
 
     esp_err_t ret = httpd_start(&s_servidor, &config);
     if (ret != ESP_OK) {

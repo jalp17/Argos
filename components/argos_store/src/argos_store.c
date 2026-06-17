@@ -2,7 +2,6 @@
 #include "store_config.h"
 #include "esp_log.h"
 #include "esp_spiffs.h"
-#include "esp_littlefs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -179,7 +178,7 @@ static esp_err_t get_partition_stats(argos_store_stats_t *stats) {
     if (stats == NULL) return ESP_ERR_INVALID_ARG;
 
     size_t total = 0, used = 0;
-    esp_err_t ret = esp_littlefs_info(ARGOS_STORE_PARTITION_LABEL, &total, &used);
+    esp_err_t ret = esp_spiffs_info(ARGOS_STORE_PARTITION_LABEL, &total, &used);
     if (ret != ESP_OK) {
         STORE_ERR("Failed to get partition info: %s", esp_err_to_name(ret));
         return ret;
@@ -204,29 +203,29 @@ esp_err_t argos_store_init(void) {
 
     STORE_LOG("Initializing storage...");
 
-    esp_vfs_littlefs_conf_t conf = {
+    esp_vfs_spiffs_conf_t conf = {
         .base_path = ARGOS_STORE_BASE_PATH,
         .partition_label = ARGOS_STORE_PARTITION_LABEL,
         .format_if_mount_failed = true,
         .max_files = ARGOS_STORE_MAX_FILES,
     };
 
-    esp_err_t ret = esp_vfs_littlefs_register(&conf);
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
     if (ret != ESP_OK) {
-        STORE_ERR("Failed to mount LittleFS: %s", esp_err_to_name(ret));
+        STORE_ERR("Failed to mount SPIFFS: %s", esp_err_to_name(ret));
         return ret;
     }
 
     ret = circular_buffer_init(&s_circular_buf, ARGOS_STORE_BUFFER_SIZE);
     if (ret != ESP_OK) {
-        esp_vfs_littlefs_unregister(ARGOS_STORE_PARTITION_LABEL);
+        esp_vfs_spiffs_unregister(ARGOS_STORE_PARTITION_LABEL);
         return ret;
     }
 
     s_file_mutex = xSemaphoreCreateMutex();
     if (s_file_mutex == NULL) {
         circular_buffer_deinit(&s_circular_buf);
-        esp_vfs_littlefs_unregister(ARGOS_STORE_PARTITION_LABEL);
+        esp_vfs_spiffs_unregister(ARGOS_STORE_PARTITION_LABEL);
         return ESP_ERR_NO_MEM;
     }
 
@@ -241,7 +240,7 @@ esp_err_t argos_store_init(void) {
         STORE_ERR("Failed to create flush task");
         vSemaphoreDelete(s_file_mutex);
         circular_buffer_deinit(&s_circular_buf);
-        esp_vfs_littlefs_unregister(ARGOS_STORE_PARTITION_LABEL);
+        esp_vfs_spiffs_unregister(ARGOS_STORE_PARTITION_LABEL);
         return ESP_ERR_NO_MEM;
     }
 
@@ -289,7 +288,7 @@ esp_err_t argos_store_deinit(void) {
         s_file_mutex = NULL;
     }
 
-    esp_vfs_littlefs_unregister(ARGOS_STORE_PARTITION_LABEL);
+    esp_vfs_spiffs_unregister(ARGOS_STORE_PARTITION_LABEL);
 
     s_initialized = false;
     STORE_LOG("Storage deinitialized");
@@ -310,11 +309,12 @@ esp_err_t argos_store_write_measurement(const argos_measurement_t *measurement) 
     }
 
     char line[128];
+    double value = measurement->value;
     int len = snprintf(line, sizeof(line), "%lu,%d,%d,%.2f\n",
                        measurement->timestamp,
                        measurement->channel,
                        (int)(measurement->value * 1000),
-                       (int)measurement->value);
+                       value);
 
     size_t available = circular_buffer_available(&s_circular_buf);
     if (available + len > s_circular_buf.size) {
@@ -426,8 +426,11 @@ esp_err_t argos_store_list_files(argos_store_file_info_t *files, size_t max_file
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL && *count < max_files) {
         if (entry->d_type == DT_REG) {
-            char path[128];
-            snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, entry->d_name);
+            char path[512];
+            int path_len = snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, entry->d_name);
+            if (path_len < 0 || path_len >= (int)sizeof(path)) {
+                continue;
+            }
 
             struct stat st;
             if (stat(path, &st) == 0) {
@@ -461,8 +464,11 @@ esp_err_t argos_store_delete_oldest(void) {
         }
     }
 
-    char path[128];
-    snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, files[oldest_idx].filename);
+    char path[512];
+    int path_len = snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, files[oldest_idx].filename);
+    if (path_len < 0 || path_len >= (int)sizeof(path)) {
+        return ESP_ERR_INVALID_ARG;
+    }
 
     if (unlink(path) == 0) {
         STORE_LOG("Deleted oldest log: %s (%d bytes)", files[oldest_idx].filename, files[oldest_idx].size);
@@ -478,8 +484,11 @@ esp_err_t argos_store_export_file(const char *filename, uint8_t *buffer, size_t 
         return ESP_ERR_INVALID_ARG;
     }
 
-    char path[128];
-    snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, filename);
+    char path[512];
+    int path_len = snprintf(path, sizeof(path), "%s/%s", ARGOS_STORE_BASE_PATH, filename);
+    if (path_len < 0 || path_len >= (int)sizeof(path)) {
+        return ESP_ERR_INVALID_ARG;
+    }
 
     FILE *f = fopen(path, "r");
     if (f == NULL) {
@@ -631,7 +640,7 @@ esp_err_t argos_store_format(void) {
         argos_store_deinit();
     }
 
-    esp_err_t ret = esp_littlefs_format(ARGOS_STORE_PARTITION_LABEL);
+    esp_err_t ret = esp_spiffs_format(ARGOS_STORE_PARTITION_LABEL);
     if (ret != ESP_OK) {
         STORE_ERR("Format failed: %s", esp_err_to_name(ret));
         return ret;

@@ -35,7 +35,7 @@ extern "C" {
 #define ARGOS_STORE_JSON_INDENT       2
 
 /* ==================== WEAR LEVELING ==================== */
-#define ARGOS_STORE_WEAR_LEVELING     1  // Enable LittleFS wear leveling
+#define ARGOS_STORE_WEAR_LEVELING     1  // Enable wear leveling (SPIFFS)
 
 /* ==================== DEBUG ==================== */
 #define ARGOS_STORE_DEBUG_ENABLE      1

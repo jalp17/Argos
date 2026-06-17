@@ -1,10 +1,11 @@
 #include "argos_hal.h"
 #include "hw_config.h"
 #include "esp_log.h"
-#include "esp_adc_cal.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include <string.h>
+
 
 static const char *TAG = ARGOS_HAL_DEBUG_TAG;
 
@@ -12,7 +13,7 @@ static adc_channel_t s_adc_channels[ARGOS_ADC_CHANNELS] = ARGOS_ADC_DEFAULT_CHAN
 static dac_channel_t s_dac_channels[ARGOS_DAC_CHANNELS] = ARGOS_DAC_DEFAULT_CHANNELS;
 static gpio_num_t s_pwm_gpios[ARGOS_PWM_CHANNELS] = ARGOS_PWM_DEFAULT_GPIOS;
 
-static esp_adc_cal_characteristics_t *s_adc_chars[ARGOS_ADC_CHANNELS] = {NULL};
+static adc_cali_handle_t s_adc_chars[ARGOS_ADC_CHANNELS] = {NULL};
 static bool s_adc_initialized = false;
 static bool s_dac_initialized = false;
 static bool s_pwm_initialized = false;
@@ -56,19 +57,20 @@ esp_err_t argos_hal_adc_init(const argos_config_t *config) {
             return ret;
         }
 
-        s_adc_chars[i] = calloc(1, sizeof(esp_adc_cal_characteristics_t));
-        if (s_adc_chars[i] == NULL) {
-            HAL_DEBUG_ERR("Failed to allocate ADC calibration for channel %d", s_adc_channels[i]);
+        adc_cali_line_fitting_config_t cali_config = {
+            .unit_id = ARGOS_ADC_UNIT,
+            .atten = ARGOS_ADC_ATTEN,
+            .bitwidth = ARGOS_ADC_WIDTH,
+            .default_vref = 1100,
+        };
+
+        ret = adc_cali_create_scheme_line_fitting(&cali_config, &s_adc_chars[i]);
+        if (ret != ESP_OK || s_adc_chars[i] == NULL) {
+            HAL_DEBUG_ERR("Failed to create ADC calibration for channel %d", s_adc_channels[i]);
             return ESP_ERR_NO_MEM;
         }
 
-        esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
-            ARGOS_ADC_UNIT, ARGOS_ADC_ATTEN, ARGOS_ADC_WIDTH, 0, s_adc_chars[i]);
-        
-        HAL_DEBUG_LOG("ADC Channel %d calibration: %s", s_adc_channels[i],
-                      val_type == ESP_ADC_CAL_VAL_EFUSE_VREF ? "eFuse Vref" :
-                      val_type == ESP_ADC_CAL_VAL_EFUSE_TP ? "eFuse Two Point" :
-                      val_type == ESP_ADC_CAL_VAL_DEFAULT_VREF ? "Default Vref" : "Unknown");
+        HAL_DEBUG_LOG("ADC Channel %d calibration created (line fitting)", s_adc_channels[i]);
     }
 
     s_adc_initialized = true;
@@ -112,11 +114,15 @@ esp_err_t argos_hal_adc_read_voltage(adc_channel_t channel, uint32_t *voltage_mv
         }
     }
 
-    if (channel_idx >= 0 && s_adc_chars[channel_idx] != NULL) {
-        *voltage_mv = esp_adc_cal_raw_to_voltage(raw, s_adc_chars[channel_idx]);
-    } else {
-        *voltage_mv = esp_adc_cal_raw_to_voltage(raw, s_adc_chars[0]);
+    adc_cali_handle_t handle = (channel_idx >= 0 && s_adc_chars[channel_idx] != NULL)
+                                ? s_adc_chars[channel_idx] : s_adc_chars[0];
+    int voltage = 0;
+    esp_err_t ret_cali = adc_cali_raw_to_voltage(handle, raw, &voltage);
+    if (ret_cali != ESP_OK) {
+        HAL_DEBUG_ERR("ADC calibration conversion failed: %s", esp_err_to_name(ret_cali));
+        return ESP_ERR_INVALID_STATE;
     }
+    *voltage_mv = (uint32_t)voltage;
 
     HAL_VERBOSE_LOG("ADC Channel %d voltage: %lu mV", channel, *voltage_mv);
     return ESP_OK;
@@ -149,7 +155,7 @@ esp_err_t argos_hal_adc_set_atten(adc_channel_t channel, adc_atten_t atten) {
     return ret;
 }
 
-esp_err_t argos_hal_adc_get_calibration(adc_channel_t channel, esp_adc_cal_characteristics_t **cal_handle) {
+esp_err_t argos_hal_adc_get_calibration(adc_channel_t channel, adc_cali_handle_t *cal_handle) {
     if (!s_adc_initialized || cal_handle == NULL) {
         return ESP_ERR_INVALID_ARG;
     }

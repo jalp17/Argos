@@ -14,7 +14,7 @@ Framework de instrumentación modular basado en ESP-IDF para ESP32. Diseñado pa
 | **ADC** | 4 canales, 12 bits, calibración multiescala (9/10/11/12 bits, 0/2.5/6/11 dB) |
 | **DAC** | 2 canales, 8 bits, escritura por valor o voltaje directo |
 | **PWM** | 4 canales, 13 bits via LEDC, frecuencia y duty configurables |
-| **Almacenamiento** | LittleFS con buffer circular de 64 KB, flush periódico a flash |
+| **Almacenamiento** | SPIFFS con buffer circular de 64 KB, flush periódico a flash |
 | **Rotación de logs** | Automática al 85%, crítica al 95% (modo solo lectura) |
 | **Conectividad** | SoftAP (SSID `Argos-AP`, IP `192.168.4.1`) |
 | **Servidor web** | HTTP en puerto 80, API REST, WebSocket en `/ws` |
@@ -35,7 +35,7 @@ Argos/
 ├── components/
 │   ├── argos_core/           ← Tipos base, colas FreeRTOS, mutex
 │   ├── argos_hal/            ← ADC, DAC, PWM, self-test, diagnósticos
-│   ├── argos_store/          ← LittleFS, buffer circular, rotación
+│   ├── argos_store/          ← SPIFFS, buffer circular, rotación
 │   ├── argos_net/            ← SoftAP, HTTP, WebSocket, REST API
 │   └── argos_router/         ← Enrutamiento, algoritmos, plantillas
 ├── test/                     ← Tests unitarios ESP-IDF (42 tests)
@@ -48,7 +48,7 @@ Argos/
 **Flujo de datos:**
 
 ```
-ADC → argos_hal → argos_router → argos_store (LittleFS)
+ADC → argos_hal → argos_router → argos_store (SPIFFS)
                                 → UART Serial
                                 → argos_net (WebSocket → panel web)
 ```
@@ -65,14 +65,7 @@ ADC → argos_hal → argos_router → argos_store (LittleFS)
 | Ninja | ≥ 1.10 |
 | Python | ≥ 3.8 |
 
-⚠️ **Nota de compatibilidad:**
-
-El código actual está diseñado para ESP-IDF v4.x. Se requiere migración a ESP-IDF v5.x para:
-- Compatibilidad con nuevos chips (ESP32-S3, ESP32-C6)
-- Corrección de APIs deprecadas (ADC calibration, watchdog)
-- Optimización de recursos (SPIFFS vs LittleFS)
-
-Consulte [MIGRACION_ESPIDF5.md](MIGRACION_ESPIDF5.md) para detalles completos.
+✅ **Compatibilidad:** Migrado a ESP-IDF v5.x (ADC calibration nueva API, SPIFFS, watchdog configurable, HTTP server actualizado).
 
 ---
 
@@ -128,7 +121,7 @@ idf.py flash monitor
 | **Contraseña** | `argos1234` |
 | **IP del servidor** | `192.168.4.1` |
 | **Puerto HTTP** | 80 |
-| **Puerto WebSocket** | 81 |
+| **Puerto WebSocket** | 80 |
 
 ---
 

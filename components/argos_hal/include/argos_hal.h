@@ -4,7 +4,8 @@
 #include "driver/adc.h"
 #include "driver/dac.h"
 #include "driver/ledc.h"
-#include "esp_adc_cal.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
 #include "argos_core.h"
 
 #ifdef __cplusplus
@@ -157,7 +158,7 @@ esp_err_t argos_hal_self_test(void);
  * @param cal_handle Puntero para manejador de calibración.
  * @return ESP_OK en éxito.
  */
-esp_err_t argos_hal_adc_get_calibration(adc_channel_t channel, esp_adc_cal_characteristics_t **cal_handle);
+esp_err_t argos_hal_adc_get_calibration(adc_channel_t channel, adc_cali_handle_t *cal_handle);
 
 #ifdef __cplusplus
 }

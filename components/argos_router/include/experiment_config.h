@@ -174,7 +174,7 @@ void exp_config_init_default(argos_experiment_config_t *config);
 esp_err_t exp_config_apply_template(argos_experiment_config_t *config, const char *template);
 
 /**
- * @brief Guarda la configuración actual como plantilla en LittleFS.
+ * @brief Guarda la configuración actual como plantilla en SPIFFS.
  * @param config Puntero a la configuración.
  * @param nombre Nombre de la plantilla.
  * @return ESP_OK en éxito.
@@ -182,7 +182,7 @@ esp_err_t exp_config_apply_template(argos_experiment_config_t *config, const cha
 esp_err_t exp_config_save_template(const argos_experiment_config_t *config, const char *nombre);
 
 /**
- * @brief Carga una plantilla desde LittleFS.
+ * @brief Carga una plantilla desde SPIFFS.
  * @param config Puntero donde cargar la configuración.
  * @param nombre Nombre de la plantilla a cargar.
  * @return ESP_OK en éxito.

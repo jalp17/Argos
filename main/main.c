@@ -37,11 +37,16 @@ static void imprimir_metricas_memoria(void) {
 }
 
 static void inicializar_watchdogs(void) {
-    esp_err_t ret = esp_task_wdt_init(ARGOS_WDT_TIMEOUT_SEC, true);
+    esp_task_wdt_config_t wdt_config = {
+        .timeout_ms = ARGOS_WDT_TIMEOUT_SEC * 1000,
+        .idle_core_mask = 0,
+        .trigger_panic = true,
+    };
+    esp_err_t ret = esp_task_wdt_init(&wdt_config);
     if (ret == ESP_OK) {
         ret = esp_task_wdt_add(NULL);
         if (ret == ESP_OK) {
-            ESP_LOGI(TAG, "TWDT configurado: %d segundos", ARGOS_WDT_TIMEOUT_SEC);
+            ESP_LOGI(TAG, "TWDT configurado: %d ms (%d s)", wdt_config.timeout_ms, ARGOS_WDT_TIMEOUT_SEC);
         } else {
             ESP_LOGW(TAG, "No se pudo agregar tarea al TWDT: %s", esp_err_to_name(ret));
         }
