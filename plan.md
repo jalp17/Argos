@@ -92,6 +92,51 @@
 - [x] `DOCUMENTACION.md`: Referencia completa de la API (83 funciones públicas, tipos, REST API, plantillas)
 - [x] `GUIA_USUARIO.md`: Guía práctica con montajes, experimentos paso a paso y solución de problemas
 
+### 🔄 Fase 11: Migración ADC a API Nueva (ESP-IDF v5.x)
+- [ ] Migrar de `esp_adc_cal.h` (deprecated) a `esp_adc/adc_cali.h` (handle-based)
+- [ ] Cambiar de `esp_adc_cal_characteristics_t*` a `adc_cali_handle_t`
+- [ ] Implementar `adc_cali_create_scheme_line_fitting()`
+- [ ] Actualizar `argos_hal_adc_get_calibration()` para usar handles
+- [ ] Eliminar `calloc()`/`free()` manual (ahora manejado internamente)
+- [ ] Actualizar dependencias CMake: `esp_adc` en lugar de `esp_adc_cal`
+- [ ] Tests unitarios para validar precisión ADC
+- **Impacto:** Ahorro de ~48 bytes RAM (12 bytes/canal × 4 canales), mejor seguridad
+
+### 🔄 Fase 12: Migración de LittleFS a SPIFFS
+- [ ] Cambiar de `esp_littlefs` a `esp_spiffs` para compatibilidad v5.x
+- [ ] Actualizar `argos_store_init()` para usar `esp_vfs_spiffs_register()`
+- [ ] Cambiar `esp_littlefs_info()` → `esp_spiffs_info()`
+- [ ] Cambiar `esp_littlefs_format()` → `esp_spiffs_format()`
+- [ ] Actualizar CMakeLists.txt: `spiffs` en lugar de `esp_littlefs`
+- [ ] Aumentar buffer de rutas de 128 → 512 bytes para seguridad
+- [ ] Implementar monitoreo de fragmentación (advertencia al 85%)
+- [ ] Tests unitarios para validar escritura/lectura
+- **Impacto:** Ahorro de ~30 KB flash, mejor rendimiento en lecturas secuenciales
+
+### 🔄 Fase 13: Actualización de Watchdog API
+- [ ] Migrar de `esp_task_wdt_init(timeout_sec, bool)` a nueva API estructurada
+- [ ] Implementar `esp_task_wdt_config_t` con `timeout_ms`, `idle_core_mask`, `trigger_panic`
+- [ ] Convertir timeout de segundos a milisegundos (×1000)
+- [ ] Configurar `idle_core_mask = 0` para monitorear ambos cores
+- [ ] Actualizar `main.c` con nueva inicialización
+- [ ] Tests unitarios para validar WDT no se dispare en operación normal
+- **Impacto:** Mayor precisión (milisegundos), compatibilidad con ESP32-S3
+
+### 🔄 Fase 14: Correcciones de API HTTP Server
+- [ ] Cambiar `close_func` → `close_fn` en `httpd_server_config_t`
+- [ ] Cambiar `open_func` → `open_fn` en `httpd_server_config_t`
+- [ ] Actualizar CMakeLists.txt: agregar dependencia explícita `esp_http_server`
+- [ ] Tests unitarios para validar conexión WebSocket
+- **Impacto:** Compatibilidad con API actualizada, eliminación de warnings
+
+### 🔄 Fase 15: Mejoras de Precisión y Calidad
+- [ ] Corregir format string de uptime: `%lu` → `%lld` (32-bit → 64-bit)
+- [ ] Usar `long long` para valores de uptime (evitar overflow)
+- [ ] Validar precisión en cálculos de voltaje ADC (usar `double`)
+- [ ] Aumentar buffer de rutas a 512 bytes en argos_store
+- [ ] Tests unitarios para validar precisión en valores grandes
+- **Impacto:** Eliminación de warnings, soporte para uptime > 136 años
+
 ## Tareas Pendientes (futuro, con hardware)
 
 1. **Pruebas en ESP32 real:** Validar ADC/DAC/PWM en hardware físico
@@ -103,7 +148,7 @@
 
 Arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en su propia rama y se fusiona a main tras validación. Prioridad: integridad de datos y estabilidad para aplicaciones de lazo cerrado.
 
-**10 de 10 fases completadas.** Framework completo con documentación, tests en host (94) y tests ESP-IDF (41).
+**10 de 15 fases completadas.** Framework funcional pero requiere migración a ESP-IDF v5.x.
 
 ## Métricas de Calidad
 
@@ -117,3 +162,4 @@ Arquitectura modular por componentes ESP-IDF. Cada componente se desarrolla en s
 - [ ] Tiempo de respuesta web < 100ms (pendiente hardware)
 - [ ] Precisión ADC según especificación ESP32 (pendiente hardware)
 - [ ] Uso de heap < 70% en operación continua (pendiente hardware)
+- [ ] Migración a ESP-IDF v5.x: 0/5 componentes migrados

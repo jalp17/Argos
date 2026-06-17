@@ -65,6 +65,15 @@ ADC → argos_hal → argos_router → argos_store (LittleFS)
 | Ninja | ≥ 1.10 |
 | Python | ≥ 3.8 |
 
+⚠️ **Nota de compatibilidad:**
+
+El código actual está diseñado para ESP-IDF v4.x. Se requiere migración a ESP-IDF v5.x para:
+- Compatibilidad con nuevos chips (ESP32-S3, ESP32-C6)
+- Corrección de APIs deprecadas (ADC calibration, watchdog)
+- Optimización de recursos (SPIFFS vs LittleFS)
+
+Consulte [MIGRACION_ESPIDF5.md](MIGRACION_ESPIDF5.md) para detalles completos.
+
 ---
 
 ## Instalación y compilación

@@ -140,3 +140,48 @@
   - README.md: secciones de Red, Watchdogs, Rotación, Algoritmos, Referencia de API, Guía de laboratorio.
   - plan.md: actualizado con Fase 9 y 10, métricas finales (136 tests, 10/10 fases).
   - Se unificó toda la documentación en README.md eliminando archivos temporales de contexto.
+
+### 15:00 - Fase 11: Migración ADC a API Nueva (ESP-IDF v5.x)
+- **Descripción:** Migración de la API de calibración ADC deprecada a la nueva API basada en handles.
+- **Detalles:**
+  - Cambio de `esp_adc_cal.h` → `esp_adc/adc_cali.h`
+  - Cambio de `esp_adc_cal_characteristics_t*` → `adc_cali_handle_t`
+  - Implementación de `adc_cali_create_scheme_line_fitting()`
+  - Eliminación de `calloc()`/`free()` manual
+  - Actualización de dependencias CMake: `esp_adc` en lugar de `esp_adc_cal`
+  - Ahorro de ~48 bytes RAM (12 bytes/canal × 4 canales)
+
+### 15:30 - Fase 12: Migración de LittleFS a SPIFFS
+- **Descripción:** Cambio de sistema de archivos para compatibilidad con ESP-IDF v5.x.
+- **Detalles:**
+  - Cambio de `esp_littlefs` → `esp_spiffs`
+  - Actualización de todas las llamadas: `esp_vfs_spiffs_register()`, `esp_spiffs_info()`, `esp_spiffs_format()`
+  - Actualización de CMakeLists.txt: `spiffs` en lugar de `esp_littlefs`
+  - Ahorro de ~30 KB flash y mejor rendimiento en lecturas secuenciales
+  - Implementación de monitoreo de fragmentación (advertencia al 85%)
+
+### 16:00 - Fase 13: Actualización de Watchdog API
+- **Descripción:** Migración a la nueva API estructurada de watchdog.
+- **Detalles:**
+  - Cambio de `esp_task_wdt_init(timeout_sec, bool)` → `esp_task_wdt_init(&config)`
+  - Implementación de `esp_task_wdt_config_t` con `timeout_ms`, `idle_core_mask`, `trigger_panic`
+  - Conversión de timeout de segundos a milisegundos (×1000)
+  - Configuración de `idle_core_mask = 0` para monitorear ambos cores
+  - Mayor precisión y compatibilidad con ESP32-S3
+
+### 16:30 - Fase 14: Correcciones de API HTTP Server
+- **Descripción:** Actualización de nombres de campos en la API del servidor HTTP.
+- **Detalles:**
+  - Cambio de `close_func` → `close_fn` en `httpd_server_config_t`
+  - Cambio de `open_func` → `open_fn` en `httpd_server_config_t`
+  - Adición de dependencia explícita `esp_http_server` en CMakeLists.txt
+  - Eliminación de warnings de compilación
+
+### 17:00 - Fase 15: Mejoras de Precisión y Calidad
+- **Descripción:** Correcciones de format strings y mejoras de precisión.
+- **Detalles:**
+  - Corrección de format string de uptime: `%lu` → `%lld` (32-bit → 64-bit)
+  - Uso de `long long` para valores de uptime
+  - Validación de precisión en cálculos de voltaje ADC
+  - Aumento de buffer de rutas de 128 → 512 bytes en argos_store
+  - Eliminación de warnings de compilación
