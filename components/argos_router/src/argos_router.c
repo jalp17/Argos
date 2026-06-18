@@ -1,5 +1,6 @@
 #include "argos_router.h"
 #include "argos_core.h"
+#include "argos_store.h"
 #include "argos_net.h"
 #include "experiment_config.h"
 #include "esp_log.h"
@@ -10,6 +11,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 static const char *TAG = "argos_router";
 

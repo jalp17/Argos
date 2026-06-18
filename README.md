@@ -3,7 +3,7 @@
 Framework de instrumentación modular basado en ESP-IDF para ESP32. Diseñado para prácticas de laboratorio de física que requieren adquisición de señales, control de lazo cerrado, almacenamiento seguro y visualización web en tiempo real —sin depender de Arduino.
 
 **Licencia:** MIT  
-**Repositorio:** `git@github.com:jalp17/Argos.git`
+**Repositorio:** `https://github.com/jalp17/Argos.git`
 
 ---
 
@@ -65,7 +65,7 @@ ADC → argos_hal → argos_router → argos_store (SPIFFS)
 | Ninja | ≥ 1.10 |
 | Python | ≥ 3.8 |
 
-✅ **Compatibilidad:** Migrado a ESP-IDF v5.x (ADC calibration nueva API, SPIFFS, watchdog configurable, HTTP server actualizado).
+✅ **Compatibilidad:** Migrado y verificado con ESP-IDF v5.3 (ADC oneshot API, SPIFFS, watchdog config estructurada, HTTP server actualizado, WebSocket en puerto 80). Compilación validada y 94/94 tests host pasados.
 
 ---
 

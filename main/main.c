@@ -2,6 +2,7 @@
 #include "argos_core.h"
 #include "argos_store.h"
 #include "argos_net.h"
+#include "net_config.h"
 #include "argos_router.h"
 #include "experiment_config.h"
 #include "esp_log.h"
@@ -46,7 +47,7 @@ static void inicializar_watchdogs(void) {
     if (ret == ESP_OK) {
         ret = esp_task_wdt_add(NULL);
         if (ret == ESP_OK) {
-            ESP_LOGI(TAG, "TWDT configurado: %d ms (%d s)", wdt_config.timeout_ms, ARGOS_WDT_TIMEOUT_SEC);
+            ESP_LOGI(TAG, "TWDT configurado: %lu ms (%d s)", (unsigned long)wdt_config.timeout_ms, ARGOS_WDT_TIMEOUT_SEC);
         } else {
             ESP_LOGW(TAG, "No se pudo agregar tarea al TWDT: %s", esp_err_to_name(ret));
         }
