@@ -89,7 +89,9 @@ void app_main(void) {
     esp_err_t ret;
 
     ret = argos_hal_adc_init(&config);
+#if SOC_DAC_SUPPORTED
     if (ret == ESP_OK) ret = argos_hal_dac_init();
+#endif
     if (ret == ESP_OK) ret = argos_hal_pwm_init();
     if (ret == ESP_OK) ret = argos_hal_self_test();
 

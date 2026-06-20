@@ -41,7 +41,8 @@ Argos/
 ├── test/                     ← Tests unitarios ESP-IDF (42 tests)
 ├── tests_host/               ← Tests en host sin hardware (94 tests)
 ├── sdkconfig.defaults        ← Configuración optimizada del SDK
-├── build.sh                  ← Script de compilación automatizada
+├── argos.sh                  ← Script interactivo multi-target (build/flash/monitor)
+├── build.sh                  ← Script de compilación automatizada (legacy)
 └── CMakeLists.txt            ← Proyecto raíz IDF
 ```
 
@@ -71,21 +72,75 @@ ADC → argos_hal → argos_router → argos_store (SPIFFS)
 
 ## Instalación y compilación
 
+### Requisitos previos
+
+- **ESP-IDF v5.3** clonado en `/tmp/esp-idf` (o en `$IDF_PATH`)
+- Toolchain Xtensa instalado (`bash install.sh esp32 esp32s3 esp32s2`)
+- Python venv activable
+
+### Compilación interactiva (recomendado)
+
 ```bash
-# 1. Clonar
-git clone git@github.com:jalp17/Argos.git && cd Argos
-
-# 2. Compilar (automatiza init de submodules e instalación)
-./build.sh
-
-# 3. O manualmente:
-source /path/to/esp-idf/export.sh
-idf.py set-target esp32
-idf.py build
-
-# 4. Flashear
-idf.py flash monitor
+./argos.sh                    # Menú interactivo: elegir target → compilar → flashear → monitor
+./argos.sh build              # Solo compilar
+./argos.sh flash              # Compilar y flashear
+./argos.sh monitor            # Solo monitor serial
 ```
+
+### Compilación manual
+
+```bash
+source /path/to/esp-idf/export.sh
+idf.py set-target esp32        # o esp32s3, esp32s2
+idf.py build
+idf.py -p /dev/ttyUSB0 flash monitor
+```
+
+---
+
+## Flujo de trabajo (workflow)
+
+### Desarrollo por fases
+
+1. **Editar código** en `main/` o `components/*/`
+2. **Compilar** para el target deseado:
+   ```bash
+   ./argos.sh build
+   ```
+3. **Verificar compilación multi-target** (opcional):
+   ```bash
+   # Para ESP32-S3 (sin DAC):
+   idf.py set-target esp32s3 && idf.py build
+   # Para ESP32 (con DAC):
+   idf.py set-target esp32 && idf.py build
+   ```
+4. **Ejecutar tests host** (sin hardware):
+   ```bash
+   cd tests_host && make run
+   ```
+5. **Flashear** al ESP32 conectado por USB:
+   ```bash
+   ./argos.sh flash
+   # o: idf.py -p /dev/ttyUSB0 flash
+   ```
+6. **Monitorear** salida serial:
+   ```bash
+   ./argos.sh monitor
+   # o: idf.py -p /dev/ttyUSB0 monitor
+   ```
+7. **Repetir** desde el paso 1 hasta lograr el comportamiento deseado
+
+### Compilación multi-target
+
+| Chip     | Target       | DAC | Comando                      |
+|----------|--------------|-----|------------------------------|
+| ESP32    | `esp32`      | Sí  | `idf.py set-target esp32`    |
+| ESP32-S2 | `esp32s2`    | Sí  | `idf.py set-target esp32s2`  |
+| ESP32-S3 | `esp32s3`    | No  | `idf.py set-target esp32s3`  |
+| ESP32-C3 | `esp32c3`    | No  | `idf.py set-target esp32c3`  |
+
+> `set-target` ejecuta `fullclean` automáticamente. El script `argos.sh` maneja
+> el cambio de target de forma interactiva y muestra las opciones disponibles.
 
 ---
 
@@ -300,8 +355,11 @@ ADC0(GPIO36) ──[R_fija]───┘  │               │
 ### Comandos útiles
 
 ```bash
-./build.sh                    # Compilar todo
-idf.py -p /dev/ttyUSB0 flash  # Flashear
+./argos.sh                    # Asistente interactivo (target→build→flash→monitor)
+./argos.sh build              # Compilar con selección de target
+./argos.sh flash              # Compilar + flashear
+./argos.sh monitor            # Monitor serial
+idf.py -p /dev/ttyUSB0 flash  # Flashear directo
 idf.py -p /dev/ttyUSB0 monitor  # Monitor serie
 idf.py test                   # Tests ESP-IDF
 cd tests_host && make run     # Tests host (94 tests)
@@ -337,4 +395,5 @@ idf.py test
 | `README.md` | Esta documentación |
 | `LICENSE` | Licencia MIT |
 | `sdkconfig.defaults` | Configuración SDK optimizada |
-| `build.sh` | Script de compilación |
+| `build.sh` | Script de compilación automatizada (legacy) |
+| `argos.sh` | Script interactivo multi-target (build/flash/monitor) |

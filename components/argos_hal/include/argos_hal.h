@@ -2,7 +2,10 @@
 #define ARGOS_HAL_H
 
 #include "driver/adc.h"
+#include "soc/soc_caps.h"
+#if SOC_DAC_SUPPORTED
 #include "driver/dac.h"
+#endif
 #include "driver/ledc.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
@@ -61,35 +64,17 @@ esp_err_t argos_hal_adc_set_atten(adc_channel_t channel, adc_atten_t atten);
 
 /* ==================== DAC ==================== */
 
-/**
- * @brief Inicializa el subsistema DAC.
- * @return ESP_OK en éxito.
- */
+#if SOC_DAC_SUPPORTED
+
 esp_err_t argos_hal_dac_init(void);
 
-/**
- * @brief Escribe valor al DAC (0-255 para 8-bit).
- * @param channel Canal DAC.
- * @param value Valor a escribir (0-255).
- * @return ESP_OK en éxito.
- */
 esp_err_t argos_hal_dac_write(dac_channel_t channel, uint8_t value);
 
-/**
- * @brief Escribe voltaje al DAC en mV.
- * @param channel Canal DAC.
- * @param voltage_mv Voltaje en mV (0-3300).
- * @return ESP_OK en éxito.
- */
 esp_err_t argos_hal_dac_write_voltage(dac_channel_t channel, uint32_t voltage_mv);
 
-/**
- * @brief Habilita/deshabilita salida DAC.
- * @param channel Canal DAC.
- * @param enable true para habilitar.
- * @return ESP_OK en éxito.
- */
 esp_err_t argos_hal_dac_enable(dac_channel_t channel, bool enable);
+
+#endif /* SOC_DAC_SUPPORTED */
 
 /* ==================== PWM (LEDC) ==================== */
 

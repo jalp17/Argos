@@ -3,7 +3,10 @@
 
 #include "argos_core.h"
 #include "driver/adc.h"
+#include "soc/soc_caps.h"
+#if SOC_DAC_SUPPORTED
 #include "driver/dac.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +49,9 @@ typedef struct {
     exp_signal_type_t tipo;          /* ADC, DAC, PWM o GPIO */
     union {
         adc_channel_t adc_ch;        /* Canal ADC si tipo=ADC */
+#if SOC_DAC_SUPPORTED
         dac_channel_t dac_ch;        /* Canal DAC si tipo=DAC */
+#endif
         uint8_t pwm_ch;              /* Canal PWM si tipo=PWM */
         uint8_t gpio_num;            /* GPIO si tipo=GPIO */
     };

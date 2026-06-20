@@ -44,6 +44,7 @@ static bool s_algo_terminado = false;
 
 /* ==================== PLANTILLAS PREDEFINIDAS ==================== */
 
+#if SOC_DAC_SUPPORTED
 static void plantilla_barrido_dac(argos_experiment_config_t *cfg) {
     strcpy(cfg->nombre, "Barrido DAC");
     strcpy(cfg->descripcion, "Barrido automático de voltaje DAC mientras se lee ADC");
@@ -82,7 +83,9 @@ static void plantilla_barrido_dac(argos_experiment_config_t *cfg) {
     cfg->columnas[3] = (exp_column_config_t){EXP_COL_DAC_OUT, "salida_mV", true};
     cfg->columnas[4] = (exp_column_config_t){EXP_COL_VALOR_ESCALADO, "escalado", false};
 }
+#endif /* SOC_DAC_SUPPORTED */
 
+#if SOC_DAC_SUPPORTED
 static void plantilla_lazo_cerrado_pid(argos_experiment_config_t *cfg) {
     strcpy(cfg->nombre, "Lazo Cerrado PID");
     strcpy(cfg->descripcion, "Control PID en lazo cerrado con realimentación ADC");
@@ -122,6 +125,7 @@ static void plantilla_lazo_cerrado_pid(argos_experiment_config_t *cfg) {
     cfg->columnas[4] = (exp_column_config_t){EXP_COL_CHANNEL, "canal", false};
     cfg->columnas[5] = (exp_column_config_t){EXP_COL_VALOR_RAW, "raw_adc", false};
 }
+#endif /* SOC_DAC_SUPPORTED */
 
 static void plantilla_rampa(argos_experiment_config_t *cfg) {
     memcpy(cfg, &s_config, sizeof(argos_experiment_config_t));
@@ -206,6 +210,7 @@ void exp_config_init_default(argos_experiment_config_t *config) {
     }
 
     /* Canales DAC por defecto: 2 canales */
+#if SOC_DAC_SUPPORTED
     config->num_canales_dac = 2;
     dac_channel_t dacs[] = {DAC_CHAN_0, DAC_CHAN_1};
     const char *nombres_dac[] = {"DAC0-GPIO25", "DAC1-GPIO26"};
@@ -217,6 +222,9 @@ void exp_config_init_default(argos_experiment_config_t *config) {
         strcpy(config->canales_dac[i].nombre, nombres_dac[i]);
         strcpy(config->canales_dac[i].unidad, "mV");
     }
+#else
+    config->num_canales_dac = 0;
+#endif
 
     /* PWM por defecto */
     config->num_canales_pwm = 2;
@@ -274,11 +282,14 @@ esp_err_t exp_config_apply_template(argos_experiment_config_t *config, const cha
     /* Primero cargar valores por defecto */
     exp_config_init_default(config);
 
+#if SOC_DAC_SUPPORTED
     if (strcmp(template, "barrido_dac") == 0) {
         plantilla_barrido_dac(config);
     } else if (strcmp(template, "lazo_cerrado_pid") == 0) {
         plantilla_lazo_cerrado_pid(config);
-    } else if (strcmp(template, "rampa") == 0) {
+    } else
+#endif
+    if (strcmp(template, "rampa") == 0) {
         plantilla_rampa(config);
     } else if (strcmp(template, "seno") == 0) {
         plantilla_seno(config);
@@ -365,7 +376,11 @@ esp_err_t exp_config_list_templates(char templates[][EXP_CONFIG_TEMPLATE_NAME_MA
     *count = 0;
 
     /* Plantillas predefinidas */
-    const char *builtin[] = {"default", "barrido_dac", "lazo_cerrado_pid", "rampa", "seno", "cuadrada"};
+    const char *builtin[] = {"default"
+#if SOC_DAC_SUPPORTED
+                             , "barrido_dac", "lazo_cerrado_pid"
+#endif
+                             , "rampa", "seno", "cuadrada"};
     size_t n_builtin = sizeof(builtin) / sizeof(builtin[0]);
 
     for (size_t i = 0; i < n_builtin && *count < max_count; i++) {
@@ -978,9 +993,11 @@ void argos_router_acquisition_task(void *arg) {
                     float salida = 0;
                     esp_err_t algo_ret = argos_router_run_algorithm_step((float)mv, &salida);
 
+#if SOC_DAC_SUPPORTED
                     if (s_config.num_canales_dac > 0 && s_config.canales_dac[0].habilitado) {
                         argos_hal_dac_write_voltage(DAC_CHAN_0, (uint32_t)salida);
                     }
+#endif
 
                     /* Enrutar medición a todos los destinos */
                     argos_router_route_measurement(&medicion);

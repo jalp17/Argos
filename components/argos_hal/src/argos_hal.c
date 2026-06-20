@@ -11,13 +11,17 @@
 static const char *TAG = ARGOS_HAL_DEBUG_TAG;
 
 static adc_channel_t s_adc_channels[ARGOS_ADC_CHANNELS] = ARGOS_ADC_DEFAULT_CHANNELS;
+#if SOC_DAC_SUPPORTED
 static dac_channel_t s_dac_channels[ARGOS_DAC_CHANNELS] = ARGOS_DAC_DEFAULT_CHANNELS;
+#endif
 static gpio_num_t s_pwm_gpios[ARGOS_PWM_CHANNELS] = ARGOS_PWM_DEFAULT_GPIOS;
 
 static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 static adc_cali_handle_t s_adc_chars[ARGOS_ADC_CHANNELS] = {NULL};
 static bool s_adc_initialized = false;
+#if SOC_DAC_SUPPORTED
 static bool s_dac_initialized = false;
+#endif
 static bool s_pwm_initialized = false;
 
 #if ARGOS_HAL_DEBUG_ENABLE
@@ -67,20 +71,32 @@ esp_err_t argos_hal_adc_init(const argos_config_t *config) {
             return ret;
         }
 
+#if ADC_CALI_SCHEME_LINE_FITTING_SUPPORTED
         adc_cali_line_fitting_config_t cali_config = {
             .unit_id = ARGOS_ADC_UNIT,
             .atten = ARGOS_ADC_ATTEN,
             .bitwidth = ARGOS_ADC_WIDTH,
             .default_vref = 1100,
         };
-
         ret = adc_cali_create_scheme_line_fitting(&cali_config, &s_adc_chars[i]);
+        HAL_DEBUG_LOG("ADC Channel %d calibration created (line fitting)", s_adc_channels[i]);
+#elif ADC_CALI_SCHEME_CURVE_FITTING_SUPPORTED
+        adc_cali_curve_fitting_config_t cali_config = {
+            .unit_id = ARGOS_ADC_UNIT,
+            .atten = ARGOS_ADC_ATTEN,
+            .bitwidth = ARGOS_ADC_WIDTH,
+        };
+        ret = adc_cali_create_scheme_curve_fitting(&cali_config, &s_adc_chars[i]);
+        HAL_DEBUG_LOG("ADC Channel %d calibration created (curve fitting)", s_adc_channels[i]);
+#else
+        s_adc_chars[i] = NULL;
+        ret = ESP_OK;
+        HAL_DEBUG_LOG("ADC Channel %d calibration not available (no scheme)", s_adc_channels[i]);
+#endif
         if (ret != ESP_OK || s_adc_chars[i] == NULL) {
             HAL_DEBUG_ERR("Failed to create ADC calibration for channel %d", s_adc_channels[i]);
             return ESP_ERR_NO_MEM;
         }
-
-        HAL_DEBUG_LOG("ADC Channel %d calibration created (line fitting)", s_adc_channels[i]);
     }
 
     s_adc_initialized = true;
@@ -189,6 +205,8 @@ esp_err_t argos_hal_adc_get_calibration(adc_channel_t channel, adc_cali_handle_t
 
 /* ==================== DAC IMPLEMENTATION ==================== */
 
+#if SOC_DAC_SUPPORTED
+
 esp_err_t argos_hal_dac_init(void) {
     if (s_dac_initialized) {
         HAL_DEBUG_WARN("DAC already initialized");
@@ -243,6 +261,8 @@ esp_err_t argos_hal_dac_enable(dac_channel_t channel, bool enable) {
     HAL_DEBUG_LOG("DAC Channel %d %s", channel, enable ? "enabled" : "disabled");
     return ret;
 }
+
+#endif /* SOC_DAC_SUPPORTED */
 
 /* ==================== PWM IMPLEMENTATION ==================== */
 
@@ -354,7 +374,9 @@ esp_err_t argos_hal_pwm_stop(uint8_t channel) {
 void argos_hal_print_diagnostics(void) {
     HAL_DEBUG_LOG("========== HAL DIAGNOSTICS ==========");
     HAL_DEBUG_LOG("ADC Initialized: %s", s_adc_initialized ? "YES" : "NO");
+#if SOC_DAC_SUPPORTED
     HAL_DEBUG_LOG("DAC Initialized: %s", s_dac_initialized ? "YES" : "NO");
+#endif
     HAL_DEBUG_LOG("PWM Initialized: %s", s_pwm_initialized ? "YES" : "NO");
 
     if (s_adc_initialized) {
@@ -404,6 +426,7 @@ esp_err_t argos_hal_self_test(void) {
         HAL_DEBUG_LOG("Self-test ADC channel %d: OK (raw=%d, voltage=%lu mV)", s_adc_channels[i], raw, voltage);
     }
 
+#if SOC_DAC_SUPPORTED
     if (s_dac_initialized) {
         for (int i = 0; i < ARGOS_DAC_CHANNELS; i++) {
             ret = argos_hal_dac_write(s_dac_channels[i], 128);
@@ -420,6 +443,7 @@ esp_err_t argos_hal_self_test(void) {
             HAL_DEBUG_LOG("Self-test DAC channel %d: OK", s_dac_channels[i]);
         }
     }
+#endif
 
     if (s_pwm_initialized) {
         for (int i = 0; i < ARGOS_PWM_CHANNELS; i++) {
